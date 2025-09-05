@@ -8,6 +8,16 @@ import config.DatabaseConfig;
 
 public class DatabaseConnection {
 
+    /**
+     * Establishes and returns a connection to the database using the configuration
+     * provided by {@link DatabaseConfig}.
+     *
+     * <p>This method uses {@link DriverManager#getConnection(String, String, String)}
+     * to create the connection.</p>
+     *
+     * @return a {@link Connection} object representing the database connection
+     * @throws RuntimeException if a {@link SQLException} occurs while trying to connect
+     */
     public static Connection getConnection() {
         Connection dbConnection = null;
         try {
