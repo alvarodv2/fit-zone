@@ -2,10 +2,7 @@ package repository;
 
 import domain.Client;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,30 +101,30 @@ public class ClientDAOImpl implements ClientDAO {
 
     @Override
     public boolean addClient(Client client) {
-        PreparedStatement preparedStatement;
-        Connection connection = getConnection();
+        String sql = "INSERT INTO client(client_name, client_second_name, membership) VALUES(?, ?, ?)";
 
-        String addClientQuery = "INSERT INTO client(client_name, client_second_name, membership)"
-                + "VALUES(?, ?, ?)";
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-        try {
-            preparedStatement = connection.prepareStatement(addClientQuery);
-            preparedStatement.setString(1, client.getClientName());
-            preparedStatement.setString(2, client.getClientSecondName());
-            preparedStatement.setInt(3, client.getMembership());
-            preparedStatement.execute();
-            return true;
-        } catch (SQLException e){
-            System.out.println("Failed to add client: " + e.getMessage());
-        } finally {
-            try {
-                connection.close();
-            } catch (Exception e){
-                System.out.println("Failed to close the DB connection: " + e.getMessage());
+            ps.setString(1, client.getClientName());
+            ps.setString(2, client.getClientSecondName());
+            ps.setInt(3, client.getMembership());
+
+            int rowsInserted = ps.executeUpdate();
+
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    client.setClientId(keys.getInt(1));
+                }
             }
+            return rowsInserted > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Failed to add client: " + e.getMessage());
+            return false;
         }
-        return false;
     }
+
 
     /**
      * Updates an existing client's information in the database.
@@ -142,30 +139,26 @@ public class ClientDAOImpl implements ClientDAO {
      */
     @Override
     public boolean updateClient(Client client) {
-        PreparedStatement preparedStatement;
-        Connection connection = getConnection();
-
-        String updateClientQuery = "UPDATE client SET client_name = ?, client_second_name = ?, membership = ? "
+        String sql = "UPDATE client SET client_name = ?, client_second_name = ?, membership = ? "
                 + "WHERE client_id = ?";
-        try {
-            preparedStatement = connection.prepareStatement(updateClientQuery);
-            preparedStatement.setString(1, client.getClientName());
-            preparedStatement.setString(2, client.getClientSecondName());
-            preparedStatement.setInt(3, client.getMembership());
-            preparedStatement.setInt(4, client.getClientId());
-            preparedStatement.execute();
-            return true;
-        } catch (SQLException e){
-            System.out.println("Failed to update client: " +e.getMessage());
-        } finally {
-            try {
-                connection.close();
-            } catch (Exception e){
-                System.out.println("Failed to close the DB connection: " + e.getMessage());
-            }
+
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, client.getClientName());
+            ps.setString(2, client.getClientSecondName());
+            ps.setInt(3, client.getMembership());
+            ps.setInt(4, client.getClientId());
+
+            int rowsUpdated = ps.executeUpdate();
+            return rowsUpdated > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Failed to update client: " + e.getMessage());
+            return false;
         }
-        return false;
     }
+
 
     /**
      * Deletes a client from the database based on its ID.
@@ -180,23 +173,19 @@ public class ClientDAOImpl implements ClientDAO {
     @Override
     public boolean deleteClient(Client client) {
         PreparedStatement preparedStatement;
-        Connection connection = getConnection();
 
-        String updateClientQuery = "DELETE FROM client WHERE client_id = ?";
-
-        try {
-            preparedStatement = connection.prepareStatement(updateClientQuery);
-            preparedStatement.setInt(1, client.getClientId());
-            preparedStatement.execute();
-            return true;
-        } catch (SQLException e){
-            System.out.println("Failed to delete a client: " +e.getMessage());
-        } finally {
+        try (Connection connection = getConnection()) {
             try {
-                connection.close();
-            } catch (Exception e){
-                System.out.println("Failed to close the DB connection" + e.getMessage());
+                String updateClientQuery = "DELETE FROM client WHERE client_id = ?";
+                preparedStatement = connection.prepareStatement(updateClientQuery);
+                preparedStatement.setInt(1, client.getClientId());
+                preparedStatement.execute();
+                return true;
+            } catch (SQLException e) {
+                System.out.println("Failed to delete a client: " + e.getMessage());
             }
+        } catch (Exception e) {
+            System.out.println("Failed to close the DB connection" + e.getMessage());
         }
         return false;
     }
