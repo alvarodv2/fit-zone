@@ -145,7 +145,7 @@ public class ClientDAOImpl implements ClientDAO {
         PreparedStatement preparedStatement;
         Connection connection = getConnection();
 
-        String updateClientQuery = "UPDATE client SET client_name = ?, client_second_name = ?, membership = ?"
+        String updateClientQuery = "UPDATE client SET client_name = ?, client_second_name = ?, membership = ? "
                 + "WHERE client_id = ?";
         try {
             preparedStatement = connection.prepareStatement(updateClientQuery);
