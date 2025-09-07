@@ -115,7 +115,7 @@ public class ClientDAOImpl implements ClientDAO {
             preparedStatement.setString(1, client.getClientName());
             preparedStatement.setString(2, client.getClientSecondName());
             preparedStatement.setInt(3, client.getMembership());
-            preparedStatement.executeQuery();
+            preparedStatement.execute();
             return true;
         } catch (SQLException e){
             System.out.println("Failed to add client: " + e.getMessage());
@@ -153,7 +153,7 @@ public class ClientDAOImpl implements ClientDAO {
             preparedStatement.setString(2, client.getClientSecondName());
             preparedStatement.setInt(3, client.getMembership());
             preparedStatement.setInt(4, client.getClientId());
-            preparedStatement.executeQuery();
+            preparedStatement.execute();
             return true;
         } catch (SQLException e){
             System.out.println("Failed to update client: " +e.getMessage());
@@ -187,7 +187,7 @@ public class ClientDAOImpl implements ClientDAO {
         try {
             preparedStatement = connection.prepareStatement(updateClientQuery);
             preparedStatement.setInt(1, client.getClientId());
-            preparedStatement.executeQuery();
+            preparedStatement.execute();
             return true;
         } catch (SQLException e){
             System.out.println("Failed to delete a client: " +e.getMessage());
