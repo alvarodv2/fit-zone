@@ -11,7 +11,7 @@ public class ZonaFitApplication {
         zonaFitApp();
     }
 
-    private static void zonaFitApp(){
+    public static void zonaFitApp(){
 
         var exitMenu = false;
         var consoleMenu = new Scanner(System.in);
@@ -28,7 +28,7 @@ public class ZonaFitApplication {
         }
     }
 
-    private static int showMenu(Scanner console){
+    public static int showMenu(Scanner console){
         System.out.print("""
                 *** ZONA FIT ***
                 1. List Clients
@@ -41,7 +41,7 @@ public class ZonaFitApplication {
         return Integer.parseInt(console.nextLine());
     }
 
-    private static boolean executeOptions(Scanner console, int option, ClientDAO clientDAO){
+    public static boolean executeOptions(Scanner console, int option, ClientDAO clientDAO){
 
         var exit = false;
         switch (option){
